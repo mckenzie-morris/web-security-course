@@ -45,7 +45,27 @@ app.get('/privacy', (_, res) => {
 app.post('/login', async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+    /* 
+    -the below SQL query is exploitable. 
+      the folly of using template literals is that SQL can be injected into either the
+      email or password fields i.e. inserting:
+      
+        ' OR 1=1--
 
+      results in the query string:
+
+      `SELECT * FROM users WHERE email = 'admin@example.com' AND password = '' OR 1=1--'`
+
+      the OR 1=1-- resolves to true, therefore allowing access.
+
+    -in order to avoid the above exploit, capitalize on the library's (express) internal
+      security mechanisms by using the following syntax:
+
+        const user = await db.get(
+          "SELECT * FROM users WHERE email = ? AND password = ?",
+          [email, password]
+        );
+    */
   const user = await db.get(
     `SELECT * FROM users WHERE email = '${email}' AND password = '${password}'`
   );
