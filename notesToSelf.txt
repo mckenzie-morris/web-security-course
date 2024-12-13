@@ -1,0 +1,20 @@
+COOKIES:
+-Small pieces of data stored on client-side to track and identify users
+    * Browser (client) sends back cookie on subsequent requests
+
+-Used to implement sessions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+========================================================================
