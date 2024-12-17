@@ -4,17 +4,57 @@ COOKIES:
 
 -Used to implement sessions
 
+-Expiration dates:
+    * Expires
+    * Max Age
+    * Without a specified expiration, cookies last for the duration of the
+      sesssion
+
+-Path attribute:
+    * indicates a URL path that must exist in the requested URL in order to
+      send the Cookie header
+
+-Domain attribute:
+    * specifies which server can receive a cookie 
+    * if specified, cookies are available on the specified server AND its 
+      subdomains
+      ~i.e. Domain=.frontendmasters.com
+       allows cookie to be sent to any subdomains of frontendmasters.com
 
 
+-Common vulnerabilities:
+1. session hijacking
+   exploits active sessions (cookie value) to gain unauthorized access- the attacker can 
+   become the user as far as the server is concerned
 
+2. cross-site scripting (XSS)
+   malicious script injected via input fields or URLs- the script then accesses cookies
+   and sends them to an attacker
 
-
-
-
-
-
-
-
+3. cross-site request forgery (CSRF)
+   a user is tricked into executing actions via a forged request exploiting that user's
+   authenticated session
 
 
 ========================================================================
+
+SAME ORIGIN POLICY:
+-A security measure implemented by web browsers to restrict how documents or
+ scripts loaded from one origin interact with resources from other origins
+ * Two resources from different sites should not be able to interfere with 
+   each other
+
+-browser checks 3 things:
+ 1. protocol (i.e. https:// or http://)
+ 2. domain (i.e. frontendmasters.com)
+ 3. port (i.e. 443)
+ * if the above 3 things are the same, the browser considers the two resources
+   to have the same origin
+
+-ways around Same Origin Policy:
+ * Cross Origin Resource Sharing (CORS)
+ * JSON with Padding (JSONP)
+ * Proxies
+ * PostMessage API
+ * WebSockets
+ * document.domain

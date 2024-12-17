@@ -1,19 +1,3 @@
-/* COMMON VULNERABILITIES OF COOKIES
-
-1.) SESSION HIJACKING
-  exploits active sessions (cookie value) to gain unauthorized access- the attacker can 
-  become the user as far as the server is concerned
-
-2.) CROSS-SITE SCRIPTING (XSS)
-  malicious script injected via input fields or URLs- the script then accesses cookies
-  and sends them to an attacker
-
-3.) CROSS-SITE REQUEST FORGERY (CSRF)
-  a user is tricked into executing actions via a forged request exploiting that user's
-  authenticated session
-
-*/
-
 import { createServer, startServer } from '#shared';
 import { readFile } from 'fs/promises';
 //!!! = my additions
