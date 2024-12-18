@@ -23,38 +23,112 @@ COOKIES:
 
 
 -Common vulnerabilities:
-1. session hijacking
-   exploits active sessions (cookie value) to gain unauthorized access- the attacker can 
-   become the user as far as the server is concerned
+  1. session hijacking
+     exploits active sessions (cookie value) to gain unauthorized access- the attacker can 
+     become the user as far as the server is concerned
 
-2. cross-site scripting (XSS)
-   malicious script injected via input fields or URLs- the script then accesses cookies
-   and sends them to an attacker
+  2. cross-site scripting (XSS)
+     malicious script injected via input fields or URLs- the script then accesses cookies
+     and sends them to an attacker
 
-3. cross-site request forgery (CSRF)
-   a user is tricked into executing actions via a forged request exploiting that user's
-   authenticated session
+  3. cross-site request forgery (CSRF)
+     a user is tricked into executing actions via a forged request exploiting that user's
+     authenticated session
 
+-Security:
+    * HTTPOnly:
+        ~prevents client-side scripts from accessing cookies
+    * Secure:
+        ~Ensures cookies are sent over HTTPS only
+    * SameSite:
+        ~Restricts how cookies are sent with cross-origin requests
+        ~Two addresses are the SameSite if they have the same TLD
+         plus one more level (i.e. example.com and login.example.com)
 
 ========================================================================
 
 SAME ORIGIN POLICY:
 -A security measure implemented by web browsers to restrict how documents or
  scripts loaded from one origin interact with resources from other origins
- * Two resources from different sites should not be able to interfere with 
-   each other
+    * Two resources from different sites should not be able to interfere with 
+      each other
 
 -browser checks 3 things:
- 1. protocol (i.e. https:// or http://)
- 2. domain (i.e. frontendmasters.com)
- 3. port (i.e. 443)
- * if the above 3 things are the same, the browser considers the two resources
-   to have the same origin
+    1. protocol (i.e. https:// or http://)
+    2. domain (i.e. frontendmasters.com)
+    3. port (i.e. 443)
+      * if the above 3 things are the same, the browser considers the two resources
+        to have the same origin
 
 -ways around Same Origin Policy:
- * Cross Origin Resource Sharing (CORS)
- * JSON with Padding (JSONP)
- * Proxies
- * PostMessage API
- * WebSockets
- * document.domain
+    * Cross Origin Resource Sharing (CORS)
+    * JSON with Padding (JSONP)
+    * Proxies
+    * PostMessage API
+    * WebSockets
+    * document.domain
+
+========================================================================
+
+SESSION HIJACKING & INJECTION:
+
+-Privilege Escalation:
+    * a type of security exploit in which an attacker gains elevated access to
+      resources that are normally protected from an application or user
+        1. attacker gains limited access to the application or system
+        2. attacker identifies misconfigurations or vulnerabilities
+        3. use weaknesses to gian higher privileges
+        4. with escalated privileges, attacker can access sensitive data or execute
+           unauthorized actions
+
+-Session Hijacking:
+    * Using a cookie value in an attempt to try to trick the server into thinking
+      you're someone that you're not
+
+-Man-in-the-Middle Attack:
+    * A type of attack where the attacker secretly intercepts and possibly alters
+      the communication between two parties who believe they are directly communicating
+      with each other
+    * Using HTTPS mitigates this issue
+
+-SQL Injection:
+    * in order to eliminate the threat of SQL injection:
+      1. use an ORM (Object Relational Mapper)
+        ~a layer of abstraction that allows the developer to interact with a database
+        using code that resembles a given programming language instead of raw SQL queries
+        ~primary protection an ORM provides against SQL injection comes from its 
+        enforcement of parameterized queries
+      2. ensure the use of parameterized queries over template literals
+
+-Parameter Injection
+    * security vulnerability that occurs when an attacker manipulates the parameters or 
+      inputs used in parameterized queries, APIs, or other interfaces
+
+-Command Injection
+    * A type of security vulnerability in which an attacker can execute arbitrary commands
+      on the host operating system via a vulnerable application
+    * target would be application that passes unsafe user inputs to system shell commands
+
+-Remote Code Execution
+    * vulnerability that allows an attacker to execute arbitrary code on a remote system
+    * occurs when user input is not properly sanitized
+        ~malicious input is processed by the server through eval functions, unsanitized
+         inputs to shell commands, or unsafe deserialization
+
+-Prevention:
+    * Input Validation:
+        ~always validate and sanitize user inputs. use strict data types and constraints
+    * Avoid Common Pitfalls:
+        ~avoid using eval(), Function(), exec(), and other potentially dangerous Node.js
+         functions
+    * Use Security Libraries:
+        ~use libraries such as DOMPurify for sanitizing HTML. use sandboxed environments
+         like VM2 for executing untrusted code
+    * Principle of Least Privilege:
+        ~run services with the minimal required permissions. do not run your application
+         as a root user
+    * Updates:
+        ~Keep Node.js and all dependencies up-to-date to mitigate known vulnerabilities
+
+
+========================================================================
