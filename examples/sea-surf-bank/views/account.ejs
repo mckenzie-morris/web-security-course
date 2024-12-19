@@ -36,6 +36,8 @@
                 required
               />
             </div>
+            <!-- send token to server on /transfer -->
+            <input id="csrfToken" type="hidden" name="_csrf" value="<% token %>"/> <!-- //!!! -->
             <button type="submit" class="p-2 text-white bg-blue-500 rounded">
               Transfer
             </button>

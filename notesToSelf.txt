@@ -202,3 +202,5 @@ CROSS-SITE REQUEST FORGERY:
              name="csrf-token"
              content="3964ccc5b64f546961343c57cf"
             />
+    * malicious sites cannot read or steal the token due to the same-origin policy, nor
+      predict or forge a valid token because the server generates and validates them
