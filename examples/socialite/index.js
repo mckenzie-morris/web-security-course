@@ -1,4 +1,5 @@
 import { startServer, createServer } from '#shared';
+import { v4 as uuid } from 'uuid'; //!!!
 
 import { db } from './database.js';
 
@@ -15,6 +16,31 @@ const app = createServer({ viewEngine: 'handlebars' });
 
 app.use(currentUser);
 app.use(methodOverride);
+
+/**
+ * @param {string} userId
+ */
+
+export const createSession = (userId) => {
+  const sessionId = uuid();
+  const token = uuid();
+
+  db.run('INSERT INTO sessions (sessionId, userId, token) VALUES (?, ?, ?)', [
+    sessionId,
+    userId,
+    token,
+  ]);
+
+  return sessionId;
+};
+
+/**
+ * @param {string} sessionId
+ */
+
+export const getSession = (sessionId) => {
+  return db.get('SELECT * FROM sessions WHERE sessionId = ?', [sessionId]);
+};
 
 app.get('/', async (req, res) => {
   const limit = req.query.limit || 50;
@@ -53,8 +79,9 @@ app.post('/login', async (req, res) => {
       .status(400)
       .render('login', { error: 'Invalid login credentials.' });
   }
+  const sessionId = createSession(user.id);
 
-  res.cookie('sessionId', user.id);
+  res.cookie('sessionId', sessionId);
   res.redirect('/');
 });
 
@@ -136,7 +163,11 @@ app.get('/posts', async (req, res) => {
 
 // Create post
 app.post('/posts', authenticate, async (req, res) => {
-  const { content } = req.body;
+  const { content, _csrf } = req.body;
+
+  if (_csrf !== res.locals.token) {
+    return res.status(403).send({ error: 'Unauthorized' });
+  }
 
   const { lastID } = await db.run(
     'INSERT INTO posts (userId, content) VALUES (?, ?)',
