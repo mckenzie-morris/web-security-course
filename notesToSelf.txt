@@ -323,3 +323,64 @@ CROSS-SITE SCRIPTING (XSS):
         ~element.value
         ~document.createTextNode
         ~document.createElement
+
+========================================================================
+
+CONTENT SECURITY POLICY (CSP):
+
+-A security feature that helps prevent a range of attacks, including XSS and data injection attacks.
+ CSP works by allowing web developers to control the resources the browser is allowed to load for
+ their site
+-Is a second layer of defense
+-How it works:
+    * Allowlist Domains:
+        ~specify which domains are permitted to load resources such as scripts, styles, or images
+    * Directive-Based:
+        ~Use various directives to control what content is allowed (i.e. script-src, style-src)
+    * Report Violations:
+        ~Optionally, configure CSP to report violations to a specified URI
+
+-Example Header:
+    * Content-Security-Policy: script-src 'self' https://trusted.cdn.com
+    * Alternatively, can use a meta tag in the head of the HTML document:
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://trusted.cdn.com">
+
+-Dealing with Legacy Applications:
+    * If using CSP will 'break stuff':
+        ~The Content-Security-Policy-Report-Only will allow one to log CSP violations, while still
+         allowing them to happen. Allows one to collect data and priortize which pages need work
+
+-Strict CSP:
+    * disallow inline styles and scripts using unsafe-inline
+    * disallow eval using unsafe-eval
+    * only allow loaded resources from specific, highly-trusted resources
+    * implement strict nonce or hash-based techniques to control script and style execution
+
+-Nonce:
+    * 'number used once'
+    * a token intended for one-time use
+    * pros:
+        ~is a small value, which means headers will be smaller so fewer bytes will be sent over the wire
+        ~won't need to update anything if the content of your script files change
+    * cons:
+        ~need to generate pages programmatically
+        ~since the initial page has the nonce, cannot cache the HTML
+
+
+-CSP:
+    * script-src 'nonce-rAnd0m' 'strict-dynamic';
+        ~scripts are only allowed if they match the nonce in the HTTP response header, and scripts
+         dynamically added by these scripts are trusted
+    * base-uri 'self';
+        ~restricts the base element, which can prevent injected scripts from changing the locations
+         that resources are loaded from
+    * block-all-mixed-content;
+        ~prevents loading any resources via HTTP on an HTTPS page
+
+-Using a Hash for CSP:
+    * the alternative to using a nonce:
+        ~example:
+            Content-Security-Policy: default-src 'none'; script-src 'sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo='
+            <script src="https://code.jquery.com/
+            jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
