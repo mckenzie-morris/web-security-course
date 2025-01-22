@@ -204,3 +204,93 @@ CROSS-SITE REQUEST FORGERY:
             />
     * malicious sites cannot read or steal the token due to the same-origin policy, nor
       predict or forge a valid token because the server generates and validates them
+
+========================================================================
+
+CROSS-ORIGIN RESOURCE SHARING:
+
+-CORS is a security feature implemented by web browsers to restrict web pages from
+ making requests to a different domain than the one that served the web page, addressing
+ the issue of cross-origin requests
+    * designed to prevent malicious websites from accessing resources on another domain
+      without permission
+    * is a safe way to get around the Same Origin Policy
+
+-CORS is not a CSRF prevention mechanism
+    * POST requests from forms are not covered by CORS
+
+-Simple requests are not subject to CORS policies
+    * Content-Type other than the below is NOT considered a simple request:
+        1. application/x-www-form-urlencoded
+        2. multipart/form-data
+        3. text/plain
+    * Request method is something other than GET, POST, or HEAD
+    * Browsers use preflight checks for complex requests (i.e. methods like PUT or DELETE, or
+      with custom headers) to ensure that the request is safe
+    * The server responds with specific HTTP headers (Access-Control-Allow-Origin, 
+      Access-Control-Allow-Methods, etc.) to specify whether the request is allowed
+
+-CORS headers:
+    1. Access-Control-Allow-Origin
+        * specifies which domains are allowed to access the resources
+    2. Access-Control-Allow-Methods
+        * specifies which methods are allowed when accessing the resource. This is used
+          in response to a preflight request
+    3. Access-Control-Allow-Headers
+        * used in response to a preflight request to indicate which HTTP headers can be used
+          when making the actual request
+    4. Access-Control-Allow-Credentials
+        * indicates whether or not the response to the request can be exposed when the Credentials
+          flag is true. if set to true, cookies and authorization headers are included in cross-origin
+          requests
+    * Some additional headers set by the browsers:
+        ~anything that starts with sec- is a header that JavaScript can't touch, which means
+         it's safe and hasn't been tampered with
+
+-Request Security Headers:
+    * sec-fetch-site:
+        ~cross-site: request initiator and the server hosting the resource have a different origin and
+         site
+        ~same-site: request initiator have the same site, but this could be a different origin
+        ~same-origin: request initiator and the server hosting the resource have the same origin
+        ~none: user did this. the user entered a URL into the address bar or opened a bookmark or dragged
+         a file into the browser window
+    * sec-fetch-dest:
+        ~empty: if they used fetch()
+        ~image: if it's an image
+        ~worker: if it was summoned by new Worker()
+        ~document: for top-level navigations
+        ~iframe: for iframes
+
+-Two Additional Headers:
+    1. sec-fetch-user:
+        * a boolean always set to true- is included when a navigation request was triggered by the user
+    2. sec-fetch-mode:
+        * one of the following: cors, navigate, no-cors, same-origin, websocket
+
+========================================================================
+
+CROSS-SITE SCRIPTING (XSS):
+
+-XSS is a type of injection attack in which malicious scripts are injected into otherwise benign trusted
+ websites
+    * This occurs when an attacker sends malicious code, generally in the form of a browser-side script,
+      to a different end user
+
+-Vectors of XSS:
+    1. Stored:
+        * The malicious data is stored in the database or somewhere else on the backend
+    2. Reflected:
+        * The malicious data is slid into the URL or query parameters
+    3. DOM-based: The malicious data is input into the DOM (i.e. an input field that changes the page)
+
+-How it works:
+    1. Injection of a Malicious Script:
+        * attacker injects malicious JavaScript (or other scripting languages) into a web app. This
+          typically happens via user input (i.e. the comments section)
+    2. Execution of Client-Side Code:
+        * The malicious script runs in the context of the victim user's session, with the permissions
+          of that user's browser
+    3. Data Theft and Manipulation:
+        * Since the script executes as if it were part of the original website, it can steal cookies,
+          session tokens, or other sensitive information
