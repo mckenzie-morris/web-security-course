@@ -274,7 +274,7 @@ CROSS-SITE SCRIPTING (XSS):
 
 -XSS is a type of injection attack in which malicious scripts are injected into otherwise benign trusted
  websites
-    * This occurs when an attacker sends malicious code, generally in the form of a browser-side script,
+    * this occurs when an attacker sends malicious code, generally in the form of a browser-side script,
       to a different end user
 
 -Vectors of XSS:
@@ -289,8 +289,37 @@ CROSS-SITE SCRIPTING (XSS):
         * attacker injects malicious JavaScript (or other scripting languages) into a web app. This
           typically happens via user input (i.e. the comments section)
     2. Execution of Client-Side Code:
-        * The malicious script runs in the context of the victim user's session, with the permissions
+        * the malicious script runs in the context of the victim user's session, with the permissions
           of that user's browser
     3. Data Theft and Manipulation:
-        * Since the script executes as if it were part of the original website, it can steal cookies,
+        * since the script executes as if it were part of the original website, it can steal cookies,
           session tokens, or other sensitive information
+
+-Best Practices for Mitigation:
+    * Input Validation:
+        ~validate and sanitize all user inputs
+    * Output Encoding:
+        ~escape user-generated content before rendering it in the browser using context-appropriate
+         escaping (HTML, JavaScript, URL, etc.)
+    * Content Security Policy (CSP):
+        ~implement CSP headers to restrict sources from where scripts, styles, and other resources can
+         be loaded
+    * Use Safe Methods:
+        ~avoid using functions that allow raw HTML input like innerHTML or document.write
+    * Libraries and Frameworks:
+        ~utilize established libraries and framworks that auto-escape content and provide built-in 
+         protection mechanisms
+
+-Safe Sink:
+    * a location or method where untrusted or user-generated data can be safely output or stored, 
+      typically after applying proper validation, sanitization, or escaping to prevent security 
+      vulnerabilities such as Cross-Site Scripting (XSS), SQL Injection, or other forms of code injection 
+      attacks
+    * some DOM methods considered safe sinks:
+        ~element.textContent
+        ~element.insertAdjacentText
+        ~element.className
+        ~element.setAttribute
+        ~element.value
+        ~document.createTextNode
+        ~document.createElement
