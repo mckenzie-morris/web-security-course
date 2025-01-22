@@ -384,3 +384,160 @@ CONTENT SECURITY POLICY (CSP):
             <script src="https://code.jquery.com/
             jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             crossorigin="anonymous"></script>
+
+========================================================================
+
+OTHER ATTACK VECTORS:
+
+-Clickjacking:
+    * a malicious technique in which an attacker tricks a user into clicking on something different
+      from what the user perceives, effectively hijacking clicks meant for a legitimate webpage
+
+-How Clickjacking works:
+    * Embedding a Webpage:
+        ~the attacker embeds the target webpage within an iframe on their malicious site
+    * Opacity & Positioning:
+        ~the iframe is made invisible (the opacity is set to 0) or positioned behind the content
+    * Deceptive UI:
+        ~the attacker places deceptive buttons or links on top of the invisible iframe elements
+    * User Interaction:
+        ~the user believes they are interacting with the visible elements but are actually interacting
+         with the concealed iframe
+
+-Clickjacking Preventative Measures:
+    * X-Frame-Options Header:
+        ~prevents the site from being displayed in iframe elements altogether
+        ~allows the site to be framed only by pages on the same origin
+        ~example:
+            <meta http-equiv="X-Frame-Options" content="DENY">
+            <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+        
+        app.use((req, res, next) => {
+            res.setHeader('X-Frame-Options', 'DENY');
+            next();
+        });
+    * For redundancy, an additional preventative measure is using CSP:
+        <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://trustedorigin.com">
+
+        app.use((req, res, next) => {
+            res.setHeader(
+                'Content-Security-Policy',
+                "frame-ancestors 'self' https://trustedorigin.com"
+            );
+            next();
+        });
+
+========================================================================
+
+JSON WEB TOKENS (JWTs):
+
+-A compact, URL-safe means of representing claims to be transferred between two parties
+
+-Anatomy of a JWT:
+    * Header:
+        ~contains metadata such as the type of token and the algorithm used for signing (HS256, RS256, etc.)
+    * Payload:
+        ~contains the actual claims or data
+    *Signature:
+        ~ensures that the token hasn't been tampered with
+
+-Claims:
+    * name-value pairs. carry information about a subject, like a user or device, securely (i.e. a claim
+      could include a user's name or role)
+    * can use various data as claims, tailoring security and functionality for the application
+    * Types of Claims:
+        ~Registered Claims:
+            -suggested, not mandatory claims. offer basic info (i.e. 'iss' reveals the JWT issuer)
+        ~Public Claims:
+            -user defined (however, should be registered with IANA or use unique URIs)
+        ~Private Claims:
+            -custom claims for specific uses, like sharing a user's permissions
+
+-JWTs vs. Session IDs:
+    * Storage of User Data:
+        ~JWT includes user data directly in the token; this data lists user ID, roles, permissions, and more.
+         This makes the server "stateless"- each request includes all the details needed to authenticate and
+         authorize the user
+        ~Session ID is a long, random string; it links user data stored on the server. This data is often in
+         memory or a database. when a request arrives, the server uses the session ID to find user info. This
+         method makes the server "stateful"
+    * Scalability:
+        ~JWTs are more scalable; they don't require server-side storage
+        ~scaling is more difficult with Session IDs; every server that could serve a user's request must
+         access their session data
+    * Security Considerations:
+        ~JWTs can be stolen if stored insecurely
+        ~saved in browsers, making them targets for XSS
+        ~once issued, their information is fixed until expiration
+        ~can instantly revoke them by using a deny list
+        ~Session IDs are more secure because the data is stored on the server
+        ~Session IDs are more susceptible to session hijacking if the Session ID is intercepted by an attacker;
+         using Secure + HttpOnly cookies can mitigate this risk
+    * Expiration Management:
+        ~the JWT controls its own expiration; its valid until expires, and checks are needed to revoke it
+        ~With Session IDs, the server manages expiration
+
+-JWT Storage (Local Storage):
+    * Easy Access:
+        ~tokens can be easily accessed from JavaScript running in the browser, making it easy to manage tokens
+         in client-side applications
+    * Persistence:
+        ~data stored in local storage persists even after the browser window is closed, facilitating persistent
+         user sessions
+    * Vulnerable to XSS:
+        ~if an attacker can execute JavaScript on the application, they can retrieve the JWTs stored in local storage
+    * No HttpOnly:
+        ~local storage does not support HttpOnly cookies, which means all stored data is accessible through client-side
+         scripts
+
+-JWT Storage (Session Storage):
+    * Tab Specific:
+        ~data is accessible only within the tab that created it
+    * Ease of Use:
+        ~easy to use and integrates well with client-side scripts
+    * Limited Lifetime:
+        ~cleared when the tab or window is closed
+    * like Local Storage, vulnerable to XSS
+
+-JWT Storage (Cookies):
+    * HttpOnly:
+        ~Cookies can be configured as HttpOnly, making them inaccessible to JavaScript and thus protecting them from
+         being stolen through XSS attacks
+    * Secure:
+        ~can be configured to be transmitted only over secure channels (HTTPS)
+    * Domain and Path Scoping:
+        ~provides additional security settings, such as restricting the Cookies to certain domains or paths
+    * CSRF Vulnerability:
+        ~unless properly configured with attributes like SameSite, Cookies can be susceptible to CSRF attacks
+    * Size Limitations:
+        ~Cookies are limited in size (around 4kb) and each HTTP request includes Cookies, which could increase
+         the load times if not managed correctly
+
+-JWT Storage (In Memory):
+    * XSS Safety:
+        ~storing JWTs in JavaScript variables can keep them out of the reach of XSS attacks, as long as the script
+         itself is not compromised
+    * Fast Access:
+        ~tokens stored in memory can be accessed very quickly
+    * Lifetime:
+        ~the token exists only as long as the page session lasts; it will be lost on page reloads or when navigating
+         to a new page, which will be unsuitable for most applications
+
+-JWT Best Practices:
+    * Include HttpOnly and Secure:
+        ~store JWTs in cookies with these attributes; this limits JavaScript access and ensures HTTPS-only transmission
+    * Add SameSite:
+        ~set the attribute to Strict or Lax to reduce CSRF risks; Lax allows some cross-site usage
+    * Limit JWT Lifespan:
+        ~set JWTs to expire in 15 minutes to an hour
+    * Refresh Tokens:
+        ~keep sessions active with refresh tokens; store them securely and use them to issue new access tokens
+    * Regular Updates:
+        ~update security systems, libraries, and frameworks to patch vulnerabilities
+    * SSL/TLS:
+        ~serve your site over HTTPS to secure data in transit
+    * CORS:
+        ~carefully set CORS to block unauthorized access
+    * Avoid Sensitive Info:
+        ~don't store sensitive data in JWTs; they are easily decoded
+    
